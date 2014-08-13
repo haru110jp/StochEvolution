@@ -8,22 +8,21 @@ import random
 
 payoff = np.array([[4,0],[3,2]]) # all players share the same payoff matrix
 p = 1/3 #If the proportion of players taking 1 exceeds this,other players are better off to take 1
-N = 10 # the number of players
+N = 100 # the number of players
 n = 1 # the number of neighbors on one side.it is 2 in total when n = 1
-epsilon = 0.1
 actions = [0,1]
 
 class player:
 	def __init__(self,actions):
-		int_action = random.choice(actions) # the initial action is randomly chosen.
-		self.action = int_action
+		init_action = random.choice(actions) # the initial action is randomly chosen.
+		self.action = init_action
 	
 players = [player(actions) for i in range(N)] #list of all players in the game
 
 def show_action_profile():
 	print [players[i].action for i in range(N)]
 	
-def update():
+def update_rational(): # function used when a player is "rational"
 	# pick a player which can change the action
 	d = random.choice(range(N))
 	nei_numbers = [] # contains the number assigned to each neighbor
@@ -44,6 +43,23 @@ def update():
 		players[d].action = 1
 	else:
 		players[d].action = 0
+
+def update_irrational(): # function used when a player is "irrational"
+	d = random.choice(range(N))
+	players[d].action = random.choice(actions)
+	
+
+def play(X=10000,epsilon=0.1): # X is the number of repetition.epsilon is the possibility of a player getting "irrational"
+	show_action_profile()
+	for i in range(X):
+		if random.uniform(0,1) > epsilon:
+			update_rational()
+		else:
+			update_irrational()
+	
+	show_action_profile()
+
+
 
 
 """
