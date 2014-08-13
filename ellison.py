@@ -39,25 +39,25 @@ def update_rational(): # function used when a player is "rational"
 			
 	nei_action = [players[i].action for i in nei_numbers] # neighbors' action profile
 		
-	if sum(nei_action) > p:   # determine the action
+	if sum(nei_action) > p:   # determine the action so that it is a best response to the action profile of the community
 		players[d].action = 1
 	else:
 		players[d].action = 0
 
 def update_irrational(): # function used when a player is "irrational"
 	d = random.choice(range(N))
-	players[d].action = random.choice(actions)
+	players[d].action = random.choice(actions) # action is randomly chosen because he is irrational
 	
 
 def play(X=10000,epsilon=0.1): # X is the number of repetition.epsilon is the possibility of a player getting "irrational"
-	show_action_profile()
+	show_action_profile() #show the initial action profile
 	for i in range(X):
 		if random.uniform(0,1) > epsilon:
 			update_rational()
 		else:
 			update_irrational()
 	
-	show_action_profile()
+	show_action_profile() # show the action profile at the end of the game
 
 
 
@@ -66,7 +66,5 @@ def play(X=10000,epsilon=0.1): # X is the number of repetition.epsilon is the po
 HOW TO USE
 
 when you run the code,first copy and paste the whole code on ipython notebook or something.
-Second, you want to type "show_action_profile()",you can check the initial action profile.
-Then you type "update()" and "show_action_profile()".This way you can set the clock one step forward
-Repeat the third if necessary
+Then you use "play()" You can see action profile of the start and the end at the same time.
 """
