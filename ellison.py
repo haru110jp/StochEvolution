@@ -15,7 +15,7 @@ actions = [0,1]
 
 class player:
 	def __init__(self,actions):
-		int_action = random.choice(actions) # the initial action is randomly choosed.
+		int_action = random.choice(actions) # the initial action is randomly chosen.
 		self.action = int_action
 	
 players = [player(actions) for i in range(N)] #list of all players in the game
@@ -40,7 +40,17 @@ def update():
 			
 	nei_action = [players[i].action for i in nei_numbers] # neighbors' action profile
 		
-	if sum(nei_action) > p:   # change the action
+	if sum(nei_action) > p:   # determine the action
 		players[d].action = 1
 	else:
 		players[d].action = 0
+
+
+"""
+HOW TO USE
+
+when you run the code,first copy and paste the whole code on ipython notebook or something.
+Second, you want to type "show_action_profile()",you can check the initial action profile.
+Then you type "update()" and "show_action_profile()".This way you can set the clock one step forward
+Repeat the third if necessary
+"""
