@@ -14,12 +14,14 @@ actions = [0,1]
 
 class player:
 	def __init__(self,actions):
-		init_action = random.choice(actions) # the initial action is randomly chosen.
-		self.action = init_action
+		self.init_action()
 	
-players = [player(actions) for i in range(N)] #list of all players in the game
+	def init_action(self):
+		self.action = random.choice(actions) # the initial action is randomly chosen.
 
-def show_action_profile():
+players = [player(actions) for i in range(N)] #list of all players in the game.
+
+def show_action_profile(players):
 	print [players[i].action for i in range(N)]
 	
 def update_rational(): # function used when a player is "rational"
@@ -49,22 +51,24 @@ def update_irrational(): # function used when a player is "irrational"
 	players[d].action = random.choice(actions) # action is randomly chosen because he is irrational
 	
 
-def play(X=10000,epsilon=0.1): # X is the number of repetition.epsilon is the possibility of a player getting "irrational"
-	show_action_profile() #show the initial action profile
+def play(players,X=10000,epsilon=0.1): # X is the number of repetition.epsilon is the possibility of a player getting "irrational"
+	show_action_profile(players) #show the initial action profile
 	for i in range(X):
 		if random.uniform(0,1) > epsilon:
 			update_rational()
 		else:
 			update_irrational()
 	
-	show_action_profile() # show the action profile at the end of the game
+	show_action_profile(players) # show the action profile at the end of the game
 
-
-
+def reset(players): # after using "play" you wanna use this to initialize the action profile
+	for i in players:
+		i.init_action()
 
 """
 HOW TO USE
 
 when you run the code,first copy and paste the whole code on ipython notebook or something.
-Then you use "play()" You can see action profile of the start and the end at the same time.
+Then you use "play(players)" You can see action profile of the start and the end at the same time.
+Type "reset(players)" if you wanna continue
 """
