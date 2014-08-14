@@ -1,4 +1,5 @@
 from __future__ import division
+import matplotlib.pyplot as plt
 import numpy as np
 import random
 
@@ -8,7 +9,7 @@ import random
 
 payoff = np.array([[4,0],[3,2]]) # all players share the same payoff matrix
 p = 1/3 #If the proportion of players taking 1 exceeds this,other players are better off to take 1
-N = 100 # the number of players
+N = 10 # the number of players
 n = 1 # the number of neighbors on one side.it is 2 in total when n = 1
 actions = [0,1]
 
@@ -19,12 +20,12 @@ class player:
 	def init_action(self):
 		self.action = random.choice(actions) # the initial action is randomly chosen.
 
-players = [player(actions) for i in range(N)] #list of all players in the game.
+players = [player(actions) for i in range(N)] #list of aldrl players in the game.
 
 def show_action_profile(players):
 	print [players[i].action for i in range(N)]
 	
-def update_rational(): # function used when a player is "rational"
+def update_rational(players): # function used when a player is "rational"
 	# pick a player which can change the action
 	d = random.choice(range(N))
 	nei_numbers = [] # contains the number assigned to each neighbor
@@ -46,7 +47,7 @@ def update_rational(): # function used when a player is "rational"
 	else:
 		players[d].action = 0
 
-def update_irrational(): # function used when a player is "irrational"
+def update_irrational(players): # function used when a player is "irrational"
 	d = random.choice(range(N))
 	players[d].action = random.choice(actions) # action is randomly chosen because he is irrational
 	
@@ -64,6 +65,30 @@ def play(players,X=10000,epsilon=0.1): # X is the number of repetition.epsilon i
 def reset(players): # after using "play" you wanna use this to initialize the action profile
 	for i in players:
 		i.init_action()
+
+def draw_histogram(players,X=100,Y=10,epsilon=0.01): # The set of X games are played Y times.
+	state_list =[] # "state" is the number of players taking 1 devided by N
+	action_profile = [players[i].action for i in range(N)]
+	state_list.append(sum(action_profile) / N) #added the initial state
+	
+	for i in range(X):
+		if random.uniform(0,1) > epsilon:
+			update_rational(players)
+		else:
+			update_irrational(players)
+		
+		action_profile = [players[i].action for i in range(N)]
+		state_list.append(sum(action_profile) / N)
+		
+	fig, axes = plt.subplots()
+	axes.hist(state_list)
+	
+	plt.show()
+				
+				
+
+
+
 
 """
 HOW TO USE
