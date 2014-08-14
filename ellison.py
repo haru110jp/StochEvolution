@@ -66,8 +66,8 @@ def reset(players): # after using "play" you wanna use this to initialize the ac
 	for i in players:
 		i.init_action()
 
-def draw_histogram(players,X=100,Y=10,epsilon=0.01): # The set of X games are played Y times.
-	state_list =[] # "state" is the number of players taking 1 devided by N
+def draw_histogram(players,X=100,epsilon=0.01): # draws a histogram about the state dynamics during the game.
+ 	state_list =[] # "state" is the number of players taking 1 devided by N
 	action_profile = [players[i].action for i in range(N)]
 	state_list.append(sum(action_profile) / N) #added the initial state
 	
