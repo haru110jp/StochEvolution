@@ -56,9 +56,9 @@ def play(players,X=10000,epsilon=0.1): # X is the number of repetition.epsilon i
 	show_action_profile(players) #show the initial action profile
 	for i in range(X):
 		if random.uniform(0,1) > epsilon:
-			update_rational()
-		else:
-			update_irrational()
+			update_rational(players=players) #the argument "update_rational" takes is the list "players" the function "play" takes.
+		else:    # it is confusing because the same name is used for both.I should make it clearer
+			update_irrational(players=players)
 	
 	show_action_profile(players) # show the action profile at the end of the game
 
@@ -80,12 +80,31 @@ def draw_histogram(players,X=100,epsilon=0.01): # draws a histogram about the st
 		action_profile = [players[i].action for i in range(N)]
 		state_list.append(sum(action_profile) / N)
 		
-	fig, axes = plt.subplots()
-	axes.hist(state_list)
+	fig, ax = plt.subplots()
+	ax.hist(state_list)
 	
 	plt.show()
+	
+def draw_graph(players,X=100,epsilon=0.01): #draws a graph which represents the state dynamics during the game
+	state_list =[] # "state" is the number of players taking 1 devided by N
+	action_profile = [players[i].action for i in range(N)]
+	state_list.append(sum(action_profile) / N) #added the initial state
+	
+	for i in range(X):
+		if random.uniform(0,1) > epsilon:
+			update_rational(players)
+		else:
+			update_irrational(players)
+		
+		action_profile = [players[i].action for i in range(N)]
+		state_list.append(sum(action_profile) / N)
 				
-				
+	fig, ax = plt.subplots()
+	ax.plot(state_list,label='state')
+	ax.legend(bbox_to_anchor=(1.05, 0), loc='best', borderaxespad=0) 
+	
+	plt.show()
+		
 
 
 
