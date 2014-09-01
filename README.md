@@ -1,6 +1,4 @@
 StochEvolution
 ==============
-coordination game 2*2 : histograms about state dynamics
-
-![coordination2*2](equilibrium_0_coordination22.png)
-![coordination2*2](equilibrium_1_coordination22.png)
+coordination game 2*2 のつかいかた
+http://nbviewer.ipython.org/github/haru110jp/stochevolution/blob/master/elison22.ipynb
