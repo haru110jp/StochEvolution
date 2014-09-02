@@ -19,18 +19,17 @@ class Player:
 
 
 class ellison22_coordination(Player): #This class "inherits" the class "Player" defined above
-	def __init__(self,actions=[0,1],p=1/3,N=10,n=1):
+	def __init__(self,p=1/3,N=10,n=1):
 		self.players = [Player() for i in range(N)]	#"players" is a list consisting of "player" 
 		self.p = p
 		self.N = N
 		self.n = n
-		self.actions = actions
+		self.actions = [0,1]
 	"""	
 	<Arguments>
 	p = 1/3 #If the proportion of players taking 1 exceeds this,other players are better off to take 1
 	N = 10 # the number of players
 	n = 1 # the number of neighbors on one side.it is 2 in total when n = 1
-	actions = [0,1]		#this is 2*2 game and there are strategy 0 and 1
 	"""
 
 
