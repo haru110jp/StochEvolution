@@ -1,7 +1,9 @@
+# coding: UTF-8
 # this program is designed for 3*3 games
 
 from __future__ import division
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d.axes3d import Axes3D
 import numpy as np
 import random
 
@@ -35,7 +37,15 @@ class ellison33(Player): #This class "inherits" the class "Player" defined above
         
 
     def show_action_profile(self):
-        print [self.players[i].action for i in range(self.N)]
+        action_profile = [self.players[i].action for i in range(self.N)]
+        
+        proportion_0 = action_profile.count(0) / float(self.N)
+        proportion_1 = action_profile.count(1) / float(self.N)
+        proportion_2 = action_profile.count(2) / float(self.N)
+        
+        
+        print (action_profile,proportion_0,proportion_1,proportion_2) 
+        
     
     
     def update_rational(self): # function used when a player is "rational"
@@ -69,10 +79,11 @@ class ellison33(Player): #This class "inherits" the class "Player" defined above
         ev2 = np.dot(action_profile,self.payoff_2)
         
         # determine the action so that it is the best response to the action profile of the community
+        #とりあえず同点のときの処理を簡単化しています。エリソンモデルではあまり良くない気もします。
         if ev0[0] >= ev1[0] and ev0[0] >= ev2[0]:
             self.players[d].action = 0
         
-        elif ev1[0] >= ev0[0] and ev1[0] > ev2[0]:
+        elif ev1[0] >= ev0[0] and ev1[0] >= ev2[0]:
             self.players[d].action = 1
         
         else:
@@ -100,15 +111,21 @@ class ellison33(Player): #This class "inherits" the class "Player" defined above
             i.init_action()
 
 
-#ここまで3*3で動作確認済み。ここからはまた改定します。（2014 9/3）
 
-
-
-    def draw_histogram(self,X=100,epsilon=0.01): # draws a histogram about the state dynamics during the game.
-        state_list =[] # "state" is the number of players taking 1 devided by N
+    def draw_scatter(self,X=100,epsilon=0.01): # draws a scatter diagram about the state dynamics during the game.
+        
         action_profile = [self.players[i].action for i in range(self.N)]
-        state_list.append(sum(action_profile) / float(self.N)) #added the initial state
-    
+        
+        #creating a list which will contain proportions of players taking a certain action
+        proportion_0 = []
+        proportion_1 = []
+        proportion_2 = []
+        
+        #computing the initial proportions
+        proportion_0.append(action_profile.count(0) / float(self.N))
+        proportion_1.append(action_profile.count(1) / float(self.N))
+        proportion_2.append(action_profile.count(2) / float(self.N))
+
         for i in range(X):
             if random.uniform(0,1) > epsilon:
                 self.update_rational()
@@ -116,29 +133,82 @@ class ellison33(Player): #This class "inherits" the class "Player" defined above
                 self.update_irrational()
         
             action_profile = [self.players[i].action for i in range(self.N)]
-            state_list.append(sum(action_profile) / float(self.N))
-		
-        fig, ax = plt.subplots()
-        ax.hist(state_list)
-    
+            proportion_0.append(action_profile.count(0) / float(self.N))
+            proportion_1.append(action_profile.count(1) / float(self.N))
+            proportion_2.append(action_profile.count(2) / float(self.N))
+
+        fig = plt.figure()
+        ax = Axes3D(fig)
+        
+        ax.scatter3D(proportion_0,proportion_1,proportion_2)
         plt.show()
+        
+        #使えるっちゃ使えますが、散布図はいらない気がします。グラフでよかった
+        
+        
+    def draw_histogram(self,X=100,epsilon=0.01): # draws a histogram about each proportion
+        
+        action_profile = [self.players[i].action for i in range(self.N)]
+        
+        #creating a list which will contain proportions of players taking a certain action
+        proportion_0 = []
+        proportion_1 = []
+        proportion_2 = []
+        
+        #computing the initial proportions
+        proportion_0.append(action_profile.count(0) / float(self.N))
+        proportion_1.append(action_profile.count(1) / float(self.N))
+        proportion_2.append(action_profile.count(2) / float(self.N))
+
+        for i in range(X):
+            if random.uniform(0,1) > epsilon:
+                self.update_rational()
+            else:
+                self.update_irrational()
+        
+            action_profile = [self.players[i].action for i in range(self.N)]
+            proportion_0.append(action_profile.count(0) / float(self.N))
+            proportion_1.append(action_profile.count(1) / float(self.N))
+            proportion_2.append(action_profile.count(2) / float(self.N))
+
+        fig, axes = plt.subplots(1, 3, figsize=(8, 12))
+        list_of_proportions = [proportion_0,proportion_1,proportion_2]
+        for i in range(3):
+            axes[i].hist(list_of_proportions[i])
+        
+        plt.show()
+        
+        #普通のヒストグラムには書けないので、やむなく3つに分けました。正確な分析には使えませんが直感的にはいいかと思います
     
     def draw_graph(self,X=100,epsilon=0.01): #draws a graph which represents the state dynamics during the game
-        state_list =[] # "state" is the number of players taking 1 devided by N
         action_profile = [self.players[i].action for i in range(self.N)]
-        state_list.append(sum(action_profile) / float(self.N)) #added the initial state
-    
+        
+        #creating a list which will contain proportions of players taking a certain action
+        proportion_0 = []
+        proportion_1 = []
+        proportion_2 = []
+        
+        #computing the initial proportions
+        proportion_0.append(action_profile.count(0) / float(self.N))
+        proportion_1.append(action_profile.count(1) / float(self.N))
+        proportion_2.append(action_profile.count(2) / float(self.N))
+
         for i in range(X):
             if random.uniform(0,1) > epsilon:
                 self.update_rational()
             else:
                 self.update_irrational()
-        
+
             action_profile = [self.players[i].action for i in range(self.N)]
-            state_list.append(sum(action_profile) / float(self.N))
-				
-        fig, ax = plt.subplots()
-        ax.plot(state_list,label='state')
-        ax.legend(bbox_to_anchor=(1.05, 0), loc='best', borderaxespad=0) 
+            proportion_0.append(action_profile.count(0) / float(self.N))
+            proportion_1.append(action_profile.count(1) / float(self.N))
+            proportion_2.append(action_profile.count(2) / float(self.N))
+
+        fig = plt.figure()
+        ax = Axes3D(fig)
+        ax.plot_wireframe(proportion_0,proportion_1,proportion_2)
     
         plt.show()
+
+#総じて図の見やすさ、分析のしやすさがなってないのでその辺を改良します
+#こちらの方が利得構造など、一般性が高いプログラムなので、2*2もこっちの方針で書き直します。
