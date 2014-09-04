@@ -1,10 +1,10 @@
 # this program is designed for 3*3 games
 
 from __future__ import division
+import random
+import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.axes3d import Axes3D
-import numpy as np
-import random
 
 
 class Player:
@@ -105,23 +105,23 @@ class ellison33(Player): #This class "inherits" the class "Player" defined above
         self.players[d].action = random.choice(self.actions) # action is randomly chosen because he is irrational
 
 
-    def play(self,X=10000,epsilon=0.01): # X is the number of repetition.epsilon is the possibility of a player getting "irrational"
+    def play(self,X=10000,epsilon=0): # X is the number of repetition.epsilon is the possibility of a player getting "irrational"
         self.show_action_profile() #show the initial action profile
         for i in range(X):
             if random.uniform(0,1) > epsilon:
-                self.update_rational() #the argument "update_rational" takes is the list "players" the function "play" takes.
-            else:    # it is confusing because the same name is used for both.I should make it clearer
+                self.update_rational() 
+            else:    
                 self.update_irrational()
 	
         self.show_action_profile() # show the action profile at the end of the game
 
-    def reset(self): # after using "play" you wanna use this to initialize the action profile
+    def reset(self): # initialize players' actions
         for i in self.players:
             i.init_action()
 
 
 
-    def draw_scatter(self,X=100,epsilon=0.01): # draws a scatter diagram about the state dynamics during the game.
+    def draw_scatter(self,X=100,epsilon=0): # draws a scatter diagram about the state dynamics during the game.
         
         action_profile = [self.players[i].action for i in range(self.N)]
         
@@ -154,7 +154,7 @@ class ellison33(Player): #This class "inherits" the class "Player" defined above
         
         
         
-    def draw_histogram(self,X=100,epsilon=0.01): # draws a histogram about each proportion
+    def draw_histogram1(self,X=100,epsilon=0): # draws a histogram about each proportion
         
         action_profile = [self.players[i].action for i in range(self.N)]
         
@@ -186,8 +186,36 @@ class ellison33(Player): #This class "inherits" the class "Player" defined above
         
         plt.show()
         
+    def draw_histogram2(self,x=1000,y=1000,epsilon=0):
+        result_box = []
+        for i in range(x):
+            
+            for i in range(y):
+                if random.uniform(0,1) > epsilon:
+                    self.update_rational() 
+                    self.update_irrational()
+            
+            action_profile = [self.players[i].action for i in range(self.N)]
+        
+            proportion_0 = action_profile.count(0) / float(self.N)
+            proportion_1 = action_profile.count(1) / float(self.N)
+            proportion_2 = action_profile.count(2) / float(self.N)
+            
+            if proportion_0 > proportion_1 and proportion_0 > proportion_2:
+                result_box.append(0)
+            elif proportion_1 > proportion_0 and proportion_1 > proportion_2:
+                result_box.append(1)
+            else:
+                result_box.append(2)
+            
+            self.reset()
+        
+        fig,ax = plt.subplots()
+        ax.hist(result_box)
+        plt.show()
+        
     
-    def draw_graph(self,X=100,epsilon=0.01): #draws a graph which represents the state dynamics during the game
+    def draw_graph(self,X=100,epsilon=0): #draws a graph which represents the state dynamics during the game
         action_profile = [self.players[i].action for i in range(self.N)]
         
         #creating a list which will contain proportions of players taking a certain action
