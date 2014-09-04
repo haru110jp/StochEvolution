@@ -9,5 +9,5 @@ http://nbviewer.ipython.org/github/haru110jp/stochevolution/blob/master/ellison3
 
 ellisonモデル3*3でどの均衡が起こりやすいのか？について簡単なテスト結果
 
-KMRっぽいと(1,1)で、ellisonっぽいといろんな可能性があるが若干(2,2)が起こりやすい?
+KMRっぽいと(1,1)が、ellisonっぽいといろんな可能性があるが若干(2,2)が起こりやすい?
 http://nbviewer.ipython.org/github/haru110jp/stochevolution/blob/master/ellison33_histogram.ipynb
