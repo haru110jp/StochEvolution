@@ -52,7 +52,7 @@ class ellison33(Player):
         # pick a player which can change the action
         d = random.choice(range(self.N))
         nei_numbers = []  # contains the number assigned to each neighbor
-        nei_numbers_with_large_small = [i for i in range(-self.n, self.n+1)]
+        nei_numbers_with_large_small = [i for i in range(d-self.n, d+self.n+1)]
         # contains the chosen player,may contain inappropriate numbers
         del nei_numbers_with_large_small[self.n]  # delete the chosen player
 
@@ -97,7 +97,7 @@ class ellison33(Player):
         elif ev1[0] > ev0[0] and ev1[0] == ev2[0]:
             self.players[d].action = random.choice([1, 2])
 
-        elif ev0[0] == ev2[0] and ev0[0] > ev2[0]:
+        elif ev0[0] == ev2[0] and ev0[0] > ev1[0]:
             self.players[d].action = random.choice([0, 2])
 
         else:
@@ -192,13 +192,14 @@ class ellison33(Player):
 
         plt.show()
 
-    def draw_histogram2(self, x=1000, y=1000, epsilon=0):
+    def draw_histogram2(self, x=1000, y=100, epsilon=0):
         result_box = []
         for i in range(x):
 
             for i in range(y):
                 if random.uniform(0, 1) > epsilon:
                     self.update_rational()
+                else:
                     self.update_irrational()
 
             action_profile = [self.players[i].action for i in range(self.N)]
