@@ -42,7 +42,7 @@ class ellison22_coordination(Player):
         # pick a player which can change the action
         d = random.choice(range(self.N))
         nei_numbers = []  # contains the number assigned to each neighbor
-        nei_numbers_with_large_small = [i for i in range(-self.n, self.n+1)]
+        nei_numbers_with_large_small = [i for i in range(d-self.n, d+self.n+1)]
         # contains the chosen player,may contain inappropriate numbers
         del nei_numbers_with_large_small[self.n]  # delete the chosen player
 
@@ -58,7 +58,7 @@ class ellison22_coordination(Player):
         # neighbors' action profile
         nei_action = [self.players[i].action for i in nei_numbers]
         # determine the action so that it is the best response
-        if sum(nei_action) > self.p:
+        if sum(nei_action)/len(nei_action) > self.p:
             self.players[d].action = 1
         else:
             self.players[d].action = 0
