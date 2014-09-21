@@ -17,11 +17,10 @@ class Player:
     # the initial action is randomly chosen.
 
 
-class ellison33(Player):
+class ellison33():
     # This class "inherits" the class "Player" defined above
     def __init__(self, N=10, n=1,
-                 payoffs=[[[6, 6], [0, 5], [0, 0]], [[5, 0], [7, 7], [5, 5]],
-                                                    [[0, 0], [5, 5], [8, 8]]]):
+                 payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]]):
         """
         payoffs takes the form of "the list of the lists containing lists"
         the default payoffs are those of "3*3 coordination games"
@@ -31,12 +30,9 @@ class ellison33(Player):
         """
         self.players = [Player() for i in range(N)]
         # "players" is a list consisting of "player"
+        self.payoffs = payoffs
         self.N = N
         self.n = n
-        self.payoff_0 = np.array(payoffs[0])
-        # possible payoffs if a player takes 0
-        self.payoff_1 = np.array(payoffs[1])
-        self.payoff_2 = np.array(payoffs[2])
         self.actions = [0, 1, 2]
 
     def show_action_profile(self):
@@ -75,33 +71,12 @@ class ellison33(Player):
 
         action_profile = np.array([proportion_of_0, proportion_of_1, proportion_of_2])
 
-        # computing the expected payoff of each action
-        ev0 = np.dot(action_profile, self.payoff_0)
-        ev1 = np.dot(action_profile, self.payoff_1)
-        ev2 = np.dot(action_profile, self.payoff_2)
+        # computing the matrix which contains expected payoffs of each action
+        expected_payoffs = np.dot(self.payoffs, action_profile)
 
         # determine the action so that
         # it is the best response to the action profile of the community
-        if ev0[0] > ev1[0] and ev0[0] > ev2[0]:
-            self.players[d].action = 0
-
-        elif ev1[0] > ev0[0] and ev1[0] > ev2[0]:
-            self.players[d].action = 1
-
-        elif ev2[0] > ev0[0] and ev2[0] > ev1[0]:
-            self.players[d].action = 2
-
-        elif ev1[0] == ev0[0] and ev1[0] > ev2[0]:
-            self.players[d].action = random.choice([0, 1])
-
-        elif ev1[0] > ev0[0] and ev1[0] == ev2[0]:
-            self.players[d].action = random.choice([1, 2])
-
-        elif ev0[0] == ev2[0] and ev0[0] > ev1[0]:
-            self.players[d].action = random.choice([0, 2])
-
-        else:
-            self.players[d].action = random.choice([0, 1, 2])
+        self.players[d].action = np.argmax(expected_payoffs)
 
     def update_irrational(self):  # function used when a player is irrational
         d = random.choice(range(self.N))
@@ -123,7 +98,7 @@ class ellison33(Player):
         self.show_action_profile()
         # show the action profile at the end of the game
 
-    def reset(self):  # initialize players' actions
+    def initialize_action_profile(self):  # initialize players' actions
         for i in self.players:
             i.init_action()
 
@@ -215,7 +190,7 @@ class ellison33(Player):
             else:
                 result_box.append(2)
 
-            self.reset()
+            self.initialize_action_profile()
 
         fig, ax = plt.subplots()
         ax.hist(result_box)
