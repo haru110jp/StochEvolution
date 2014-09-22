@@ -8,12 +8,13 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 
 class Player:
-    def __init__(self):
+    def __init__(self, how_many_actions):
+        self.num_of_actions = how_many_actions
         self.init_action()
-
+        
     def init_action(self):
-        actions = [0, 1, 2]
-        self.action = random.choice(actions)
+        possible_actions = range(self.num_of_actions)
+        self.action = random.choice(possible_actions)
     # the initial action is randomly chosen.
 
 
@@ -28,21 +29,22 @@ class ellison33():
         N = 10 # the number of players
         n = 1 # the number of neighbors on one side.it is 2 in total when n = 1
         """
-        self.players = [Player() for i in range(N)]
+        self.players = [Player(len(payoffs)) for i in range(N)]
         # "players" is a list consisting of "player"
         self.payoffs = payoffs
         self.N = N
         self.n = n
-        self.actions = [0, 1, 2]
+        # actions players can take
+        self.actions = range(len(payoffs))
 
     def show_action_profile(self):
         action_profile = [self.players[i].action for i in range(self.N)]
+        proportions = np.empty(len(self.payoffs))
+        for i in range(len(self.payoffs)):
+            proportion_of_i = action_profile.count(i) / float(self.N)
+            proportions[i] = proportion_of_i
 
-        proportion_0 = action_profile.count(0) / float(self.N)
-        proportion_1 = action_profile.count(1) / float(self.N)
-        proportion_2 = action_profile.count(2) / float(self.N)
-
-        print (action_profile, proportion_0, proportion_1, proportion_2)
+        print (action_profile,proportions)
 
     def update_rational(self):  # function used when a player is "rational"
         # pick a player which can change the action
@@ -61,18 +63,17 @@ class ellison33():
 
             nei_numbers.append(i)
 
-        nei_action = [self.players[i].action for i in nei_numbers]
+        nei_actions = [self.players[i].action for i in nei_numbers]
         # neighbors' action profile
 
         # computing the ratio of players taking a certain action in the nei
-        proportion_of_0 = sum(0 == k for k in nei_action) / float(len(nei_action))
-        proportion_of_1 = sum(1 == k for k in nei_action) / float(len(nei_action))
-        proportion_of_2 = 1 - proportion_of_0 - proportion_of_1
-
-        action_profile = np.array([proportion_of_0, proportion_of_1, proportion_of_2])
+        proportions = np.empty(len(self.payoffs))
+        for i in range(len(self.payoffs)):
+            proportion_of_i = nei_actions.count(i) / float(len(nei_actions))
+            proportions[i] = proportion_of_i
 
         # computing the matrix which contains expected payoffs of each action
-        expected_payoffs = np.dot(self.payoffs, action_profile)
+        expected_payoffs = np.dot(self.payoffs, proportions)
 
         # determine the action so that
         # it is the best response to the action profile of the community
