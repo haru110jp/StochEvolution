@@ -1,10 +1,19 @@
-# this program is designed for 3*3 games
+"""
+''Author'': Atsushi Yamagishi
+''File Name'': ellison_sim.py
+''License'': MIT license
 
+I thank Daisuke Oyama for his guidance and helpful advice.
+I am also grateful to Sarina Ogawa for her cooperation.
+
+This program can simulate the stochastic evolution model raised
+by G, Ellison(1993). The class of games this can handle
+is a symmetric game with n strategies.
+
+"""
 from __future__ import division
 import random
 import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 
 class Player:
@@ -25,8 +34,9 @@ class ellison33():
         """
         the default payoffs are those of "3*3 coordination games"
 
-        N = 10 # the number of players
-        n = 1 # the number of neighbors on one side.it is 2 in total when n = 1
+        N = 10  The number of players
+        n = 1  The number of neighbors on one side.it is 2 in total when n = 1
+        payoffs = The payoff matrix of the game 
         """
         self.players = [Player(len(payoffs)) for i in range(N)]
         # "players" is a list consisting of "player"
@@ -128,101 +138,3 @@ class ellison33():
         ax.hist(result_box)
         plt.show()
 
-"""
-Visually ugly and useless methods.I don't delete it just because it can be helpful for me in 
-writting a method with a similar functionality.
-Another bad thing about these methods is that they can be used only for
-3*3 games.
-
-    def draw_scatter(self, X=100, epsilon=0): # only for 3*3
-        # draws a scatter diagram about the state dynamics during the game.
-
-        action_profile = [self.players[i].action for i in range(self.N)]
-        proportions = np.empty((self.strategies, X))
-        for i in range(len(self.payoffs)):
-            proportion_of_i = action_profile.count(i) / float(self.N)
-            proportions[i, 0] = proportion_of_i
-
-        for t in range(X):
-            if random.uniform(0, 1) > epsilon:
-                self.update_rational()
-            else:
-                self.update_irrational()
-
-            action_profile = [self.players[m].action for m in range(self.N)]
-            for i in range(len(self.payoffs)):
-                proportion_of_i = action_profile.count(i) / float(self.N)
-                proportions[i, t] = proportion_of_i
-            
-        
-
-        fig = plt.figure()
-        ax = Axes3D(fig)
-        dots = np.vsplit(proportions, self.strategies)
-        print(dots)
-        ax.scatter3D(dots[0], dots[1], dots[2])
-        plt.show()
-        
-    def draw_graph(self, X=100, epsilon=0):
-        # draws a graph which represents the state dynamics during the game
-        action_profile = [self.players[i].action for i in range(self.N)]
-
-        # creating a list of proportions of players taking a certain action
-        proportion_0 = []
-        proportion_1 = []
-        proportion_2 = []
-
-        # computing the initial proportions
-        proportion_0.append(action_profile.count(0) / float(self.N))
-        proportion_1.append(action_profile.count(1) / float(self.N))
-        proportion_2.append(action_profile.count(2) / float(self.N))
-
-        for i in range(X):
-            if random.uniform(0, 1) > epsilon:
-                self.update_rational()
-            else:
-                self.update_irrational()
-
-            action_profile = [self.players[i].action for i in range(self.N)]
-            proportion_0.append(action_profile.count(0) / float(self.N))
-            proportion_1.append(action_profile.count(1) / float(self.N))
-            proportion_2.append(action_profile.count(2) / float(self.N))
-
-        fig = plt.figure()
-        ax = Axes3D(fig)
-        ax.plot_wireframe(proportion_0, proportion_1, proportion_2)
-
-        plt.show()
-
-    def draw_histogram1(self, X=100, epsilon=0):
-        # draws a histogram about each proportion
-
-        action_profile = [self.players[i].action for i in range(self.N)]
-
-        proportions = np.empty((self.strategies, X))
-        for i in range(len(self.payoffs)):
-            proportion_of_i = action_profile.count(i) / float(self.N)
-            proportions[i, 0] = proportion_of_i
-
-        for t in range(X):
-            if random.uniform(0, 1) > epsilon:
-                self.update_rational()
-            else:
-                self.update_irrational()
-
-            action_profile = [self.players[n].action for n in range(self.N)]
-            for i in range(self.strategies):
-                proportion_of_i = action_profile.count(i) / float(self.N)
-                proportions[i, t] = proportion_of_i
-
-        profiles = np.vsplit(proportions, self.strategies)
-        print(profiles[0])
-        for i in profiles:
-            i.transpose()
-        fig, axes = plt.subplots(1, self.strategies, figsize=(8, 12))
-        for i in range(self.strategies):
-            axes[i].hist(profiles[i])
-
-        plt.show()
-
-"""
