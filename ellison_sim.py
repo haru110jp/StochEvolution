@@ -27,7 +27,7 @@ class Player:
     # the initial action is randomly chosen.
 
 
-class ellison33():
+class ellison():
     # This class "inherits" the class "Player" defined above
     def __init__(self, N=10, n=1,
                  payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]]):
@@ -41,13 +41,14 @@ class ellison33():
         self.players = [Player(len(payoffs)) for i in range(N)]
         # "players" is a list consisting of "player"
         self.payoffs = payoffs
-        self.strategies = len(payoffs)
+        self.strategies = len(payoffs) # the number of strategies
         self.N = N
         self.n = n
         # actions players can take
         self.actions = range(len(payoffs))
 
     def show_action_profile(self):
+        # shows the current action profile
         action_profile = [self.players[i].action for i in range(self.N)]
         proportions = np.empty(self.strategies)
         for i in range(self.strategies):
