@@ -14,6 +14,7 @@ is a symmetric game with n strategies.
 from __future__ import division
 import random
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Player:
@@ -41,7 +42,7 @@ class ellison():
         self.players = [Player(len(payoffs)) for i in range(N)]
         # "players" is a list consisting of "player"
         self.payoffs = payoffs
-        self.strategies = len(payoffs) # the number of strategies
+        self.num_actions = len(payoffs) # the number of actions
         self.N = N
         self.n = n
         # actions players can take
@@ -50,8 +51,8 @@ class ellison():
     def show_action_profile(self):
         # shows the current action profile
         action_profile = [self.players[i].action for i in range(self.N)]
-        proportions = np.empty(self.strategies)
-        for i in range(self.strategies):
+        proportions = np.empty(self.num_actions)
+        for i in range(self.num_actions):
             proportion_of_i = action_profile.count(i) / float(self.N)
             proportions[i] = proportion_of_i
 
@@ -78,7 +79,7 @@ class ellison():
         # neighbors' action profile
 
         # computing the ratio of players taking a certain action in the nei
-        proportions = np.empty(self.strategies)
+        proportions = np.empty(self.num_actions)
         for i in range(len(self.payoffs)):
             proportion_of_i = nei_actions.count(i) / float(len(nei_actions))
             proportions[i] = proportion_of_i
@@ -125,8 +126,8 @@ class ellison():
                     self.update_irrational()
 
             action_profile = [self.players[i].action for i in range(self.N)]
-            proportions = np.empty(self.strategies)
-            for i in range(self.strategies):
+            proportions = np.empty(self.num_actions)
+            for i in range(self.num_actions):
                 proportion_of_i = action_profile.count(i) / float(self.N)
                 proportions[i] = proportion_of_i
             
