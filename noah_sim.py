@@ -11,6 +11,7 @@ by Noah(2014).
 
 from __future__ import division
 import random
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -23,17 +24,17 @@ class Player_Noah():
     payoffs: payoff matrix.Only symmetric games are allowed.
     epsilon: Weight on the current observation
     """
-    def __init__(self, sigma=1, payoffs=[[3, 2], [0, 4]], epsilon=0.1):
+    def __init__(self, var=1, payoffs=[[4, 0], [3, 2]], epsilon=0.01):
         
         self.num_actions = len(payoffs)
         self.action = 0 # The initial action doesn't matter.
         self.belief = self.init_belief()
         self.epsilon = epsilon
-        self.sigma = sigma
+        self.var = var
         self.payoffs = np.array(payoffs)
 
     def init_belief(self):
-        b = [0, 1]
+        b = [1, 0]
         """
         x = 1
         for i in range(self.num_actions):
@@ -57,7 +58,7 @@ class Player_Noah():
         expected_payoffs = np.dot(self.payoffs, self.belief)
         # draw the payoff shocks
         for i in range(self.num_actions):
-            expected_payoffs[i] = expected_payoffs[i] + random.gauss(0, self.sigma)
+            expected_payoffs[i] = expected_payoffs[i] + random.gauss(0, self.var)
         # determine the best response
         self.action = np.argmax(expected_payoffs)
         
