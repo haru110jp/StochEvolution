@@ -6,14 +6,16 @@
 I thank Daisuke Oyama for his guidance and helpful advice.
 
 This program can simulate the stochastic fictitious play model
-by Noah(2014).
+by Noah Williams(2014).
 """
 
 from __future__ import division
 import random
-import math
+from math import sqrt
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.tri as tri
+from scipy.interpolate import interp1d
 
 class Player_Noah():
     """
@@ -24,8 +26,9 @@ class Player_Noah():
     payoffs: payoff matrix.Only symmetric games are allowed.
     epsilon: Weight on the current observation
     """
-    def __init__(self, var=1, payoffs=[[4, 0], [3, 2]], epsilon=0.01):
-        
+    def __init__(self, var=4, \
+                 payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]], epsilon=0.2):
+        # The payoff shocks are assumed to be normally distributed
         self.num_actions = len(payoffs)
         self.action = 0 # The initial action doesn't matter.
         self.belief = self.init_belief()
@@ -34,36 +37,127 @@ class Player_Noah():
         self.payoffs = np.array(payoffs)
 
     def init_belief(self):
-        b = [1, 0]
-        """
+        b = []
+        # Random mode
+        
         x = 1
         for i in range(self.num_actions):
-            if i != self.num_actions:
-                x = random.uniform(0, x)
-                b.append(x)
+            if i != self.num_actions - 1:
+                m = random.uniform(0, x)
+                x = x - m
+                b.append(m)
             else:
                 y = 1 - sum(b)
                 b.append(y)
-        """
+
         return b
 
     def update_belief(self, opponent_action):
         for i in range(self.num_actions):
             if i == opponent_action:
-                self.belief[i] = self.belief[i] + self.epsilon * (1 - self.belief[i])
+                current = self.belief[i]
+                self.belief[i] = current + self.epsilon * (1 - current)
             else:
-                self.belief[i] = (1 - self.epsilon) * self.belief[i]
+                current = self.belief[i]
+                self.belief[i] = (1 - self.epsilon) * current
+            
+        return self.belief
 
     def update_action(self):
         expected_payoffs = np.dot(self.payoffs, self.belief)
         # draw the payoff shocks
         for i in range(self.num_actions):
-            expected_payoffs[i] = expected_payoffs[i] + random.gauss(0, self.var)
+            ep_i = expected_payoffs[i] 
+            expected_payoffs[i] = ep_i + random.gauss(0, self.var)
         # determine the best response
         self.action = np.argmax(expected_payoffs)
         
         return self.action
 
+# plotting the belief part
+"""
+"project_3d_to_simplex" is taken from plot_simplex.py by "oyamad"
+https://gist.github.com/oyamad/7a11edb8f8e8e24bcf0c
+"""
+def project_3d_to_simplex(points_ndarray):
+    x = np.empty((2, len(points_ndarray)))
+    x[:] = \
+        (points_ndarray[:, 0] + 2*points_ndarray[:, 2])*sqrt(3)/3, \
+        points_ndarray[:, 0]
+    return x
+
+player0 = Player_Noah()
+player1 = Player_Noah()
+
+beliefs_0 = []
+beliefs_1 = []
+
+for i in range(10000):
+    beliefs_0.append(player0.belief)
+    beliefs_1.append(player1.belief)
+
+    a = player0.update_action()
+    b = player1.update_action()
+
+    newbelief_0 = player0.update_belief(b)
+    newbelief_1 = player1.update_belief(a)
+    
+    player0.belief = newbelief_0
+    player1.belief = newbelief_1
+
+beliefs_0_array = np.array(beliefs_0)
+beliefs_1_array = np.array(beliefs_1)
+
+
+points_simplex = project_3d_to_simplex(beliefs_0_array)
+points2_simplex = project_3d_to_simplex(beliefs_1_array)
+
+
+vertices= np.array([[sqrt(3)/3, 1], [0, 0], [2*sqrt(3)/3, 0]])
+triangle = tri.Triangulation(vertices[:, 0], vertices[:, 1])
+ 
+fig, ax = plt.subplots()
+ax.triplot(triangle)
+ax.set_axis_off()
+# ax.set_xlim(0, 2*sqrt(3)/3)
+# ax.set_ylim(0, 1)
+ax.set_aspect('equal')
+ax.scatter(points_simplex[0], points_simplex[1], c='black')
+ax.scatter(points2_simplex[0], points2_simplex[1], c='red')
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
 player0 = Player_Noah()
 player1 = Player_Noah()
 
@@ -95,3 +189,4 @@ for i in range(100000):
         n_11 = n_11 + 1
 
 print(n_00, n_01, n_10, n_11)
+"""
