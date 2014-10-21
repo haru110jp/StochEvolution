@@ -26,7 +26,7 @@ class Player_Noah():
     payoffs: payoff matrix.Only symmetric games are allowed.
     epsilon: Weight on the current observation
     """
-    def __init__(self, var=4, \
+    def __init__(self, var=1, \
                  payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]], epsilon=0.2):
         # The payoff shocks are assumed to be normally distributed
         self.num_actions = len(payoffs)
@@ -51,8 +51,10 @@ class Player_Noah():
                 b.append(y)
 
         return b
+        
 
     def update_belief(self, opponent_action):
+        
         for i in range(self.num_actions):
             if i == opponent_action:
                 current = self.belief[i]
@@ -79,6 +81,7 @@ class Player_Noah():
 "project_3d_to_simplex" is taken from plot_simplex.py by "oyamad"
 https://gist.github.com/oyamad/7a11edb8f8e8e24bcf0c
 """
+
 def project_3d_to_simplex(points_ndarray):
     x = np.empty((2, len(points_ndarray)))
     x[:] = \
@@ -89,28 +92,27 @@ def project_3d_to_simplex(points_ndarray):
 player0 = Player_Noah()
 player1 = Player_Noah()
 
-beliefs_0 = []
-beliefs_1 = []
+T = 10000 # the number of repetition
 
-for i in range(10000):
-    beliefs_0.append(player0.belief)
-    beliefs_1.append(player1.belief)
+beliefs_0 = np.empty((T, player0.num_actions))
+beliefs_1 = np.empty((T, player1.num_actions))
 
+for i in range(T):
+    for m in range(player0.num_actions):
+        beliefs_0[i][m] = player0.belief[m]
+
+    for n in range(player1.num_actions):
+        beliefs_1[i][n] = player1.belief[n]
+        
     a = player0.update_action()
     b = player1.update_action()
 
-    newbelief_0 = player0.update_belief(b)
-    newbelief_1 = player1.update_belief(a)
+    player0.update_belief(b)
+    player1.update_belief(a)
     
-    player0.belief = newbelief_0
-    player1.belief = newbelief_1
 
-beliefs_0_array = np.array(beliefs_0)
-beliefs_1_array = np.array(beliefs_1)
-
-
-points_simplex = project_3d_to_simplex(beliefs_0_array)
-points2_simplex = project_3d_to_simplex(beliefs_1_array)
+points_simplex = project_3d_to_simplex(beliefs_0)
+points2_simplex = project_3d_to_simplex(beliefs_1)
 
 
 vertices= np.array([[sqrt(3)/3, 1], [0, 0], [2*sqrt(3)/3, 0]])
@@ -121,6 +123,10 @@ ax.triplot(triangle)
 ax.set_axis_off()
 # ax.set_xlim(0, 2*sqrt(3)/3)
 # ax.set_ylim(0, 1)
+ax.text(0, 0, '0')
+ax.text(sqrt(3)/3, 1, '1')
+ax.text(2*sqrt(3)/3, 0, '2')
+
 ax.set_aspect('equal')
 ax.scatter(points_simplex[0], points_simplex[1], c='black')
 ax.scatter(points2_simplex[0], points2_simplex[1], c='red')
