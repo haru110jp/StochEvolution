@@ -31,7 +31,7 @@ class Player:
     
 class ellison:
     # This class "inherits" the class "Player" defined above
-    def __init__(self,network, n=1,
+    def __init__(self,network=nx.cycle_graph(10), n=1,
                  payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]]):
         """
         the default payoffs are those of "3*3 coordination games"
@@ -39,14 +39,14 @@ class ellison:
         n = 1  How far players you play a game with
         payoffs = The payoff matrix of the game 
         network = The network you want to analyze.Use NetworkX graph
-        example: nx.cycle_graph(N)
+        example: nx.cycle_graph(6)
         """
         self.players = \
         [Player(len(payoffs)) for i in range(nx.number_of_nodes(network))]
         # "players" is a list consisting of "player"
         self.payoffs = payoffs
         self.num_actions = len(payoffs) # the number of actions
-        self.N = nx.number_of_nodes(network)
+        self.N = nx.number_of_nodes(network) # The number of players
         self.n = n
         self.network = network
         self.adj_matrix = nx.adjacency_matrix(network)
@@ -117,6 +117,10 @@ class ellison:
     def initialize_action_profile(self):  # initialize players' actions
         for i in self.players:
             i.init_action()
+
+    def visualize_the_network(self):
+        nx.draw(self.network)
+        plt.show()
 
     def draw_histogram(self, x=1000, y=100, epsilon=0):
         result_box = []
