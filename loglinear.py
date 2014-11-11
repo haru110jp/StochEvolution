@@ -24,6 +24,7 @@ class Player_loglin():
         self.payoffs = np.array(payoffs)
 
     def update_action(self, opponent_action):
+        # comptute the prob each action is taken, given the other's action
         # First compute the probability with which an action is taken.
         # Computing (2.3) in the original thesis by Okada and Oliver.
         prob_distribution = np.zeros(self.num_actions)

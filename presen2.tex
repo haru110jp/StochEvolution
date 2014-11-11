@@ -1,0 +1,172 @@
+\documentclass[dvipdfmx,fleqn]{beamer}
+%\documentclass[dvipdfmx,fleqn,handout]{beamer}
+\usepackage{amsmath,amssymb,amsthm,pxjahyper}
+\usepackage{minijs}
+\usepackage{otf}
+\mode<presentation>
+{
+  \usetheme{Hannover}
+}
+\usecolortheme{dove}
+\usefonttheme{professionalfonts}
+\setbeamertemplate{frametitle}[default][center]
+\setbeamertemplate{navigation symbols}{}
+\setbeamercovered{transparent}
+\setbeamertemplate{footline}[page number]
+\setbeamerfont{footline}{size=\scriptsize}
+
+\setcounter{framenumber}{0}
+
+\title{確率進化モデル}
+\author{山岸　敦}
+\institute{東京大学経済学部３年・尾山ゼミ}
+\date{2014 11/10}
+
+\begin{document}
+\frame{\titlepage}
+
+\section{} %ヨコに目次を表示するためにつけてます（これ消すと、他のも消える）
+
+\section{現在の進行状況}
+\begin{frame}\frametitle{現在の進行状況}
+\begin{itemize}\setlength{\parskip}{0.5em}
+\item
+Ellisonモデルからの拡張となるネットワークの話は、いったん保留
+\item
+ネットワーク班の進捗を待ちつつ、別の確率進化モデルのプログラムを書くことに
+\item
+Stochastic Fictitious PlayとLog-Linear Dynamicsに沿って行動するプレイヤーのクラスを作成
+\end{itemize}
+\end{frame}
+
+
+
+\section{Stochastic Fictitious Play}
+\begin{frame}
+\frametitle{Fictitious Playのおさらい}
+\begin{itemize}\setlength{\parskip}{0.5em}
+\item
+"Stochastic" Fictitious Playは、夏学期にやったFictitious Playの応用版です。
+\item
+念のため、Fictitious Playを復習しましょう……
+\item
+覚えておいて欲しいのは、{\bf 新たな情報に対するウェートがどんどん低下している}ということです
+\item
+これは、相手の真の（最初からずっと不変の）真の混合戦略を学習しようとしている、と解釈できます
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Stochastic Fictitious Play}
+\begin{itemize}\setlength{\parskip}{0.5em}
+\item
+Stochastic Fictitious Playでは、ウェートが低下しません。Fictitious Playより現在を重視しています
+\item
+「相手の真の戦略分布が途中で変わるかもしれない」と想定していることを示唆
+\item
+"プレーヤ2の、プレイヤー１が関してが戦略iをとってくる確率の予想”を$\theta_{1it}$と表し、$\epsilon$は定数とすれば
+\[
+\theta_{1it+1} = \theta_{1it} + \epsilon(1_{(Player\:1\:plays\:i\,)} - \theta_{1it})
+\]
+\item
+ただし、$1_{(Player\:1\:plays\:i\:)}$は、プレイヤー1がiをすると1で、そうでないと0です（Indicator Function）
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Stochastic Fictitious Play}
+\begin{itemize}\setlength{\parskip}{0.5em}
+\item
+これだけでは、"Stochastic"な要素がありません
+\item
+利得にランダム性が導入されます。普通に期待利得を計算した後確率変数が「ボーナスorペナルティ」として加算され、それを見てから意思決定がされます
+\item
+$\theta_{2t} = (\theta_{21t},\theta_{22t},...)$とし、さらに$\alpha_{i1}$で相手が戦略1を取った時、戦略iのもたらす利得を表記して$\alpha_i = (\alpha_{1i},\alpha_{1i}...)$とします。$ \mathrm{e}^1_{it} $は、プレイヤー1の戦略iに入る"ボーナスポイント"です
+\item
+t期に、プレイヤー1が戦略iを取るとき、
+\[
+\theta_{2t} \cdot \alpha_i +  \mathrm{e}^1_{it} \: \ge \: \max_{j \neq j} \{\theta_{2t} \cdot \alpha_j + \mathrm{e}^1_{jt} \}
+\]
+
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Stochastic Fictitious Play}
+\begin{itemize}\setlength{\parskip}{0.5em}
+\item
+とりあえず動くようにはなっているので、動かしてみましょう
+\item
+ビジュアル面は随時改善します
+\end{itemize}
+\end{frame}
+
+\section{Log-linear Dynamics}
+\begin{frame}
+\frametitle{Log-Linear Dynamics}
+\begin{itemize}\setlength{\parskip}{0.5em}
+\item
+つづいて、Log-Linear Dynamicsの方に移ります
+\item
+未完成ですが、骨格はできています。
+\item
+プレイヤーのクラスができたので、あとはゲーム全体の流れを書くプログラムのなかにはめ込むだけ
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Log-Linear Dynamics}
+\begin{itemize}\setlength{\parskip}{0.5em}
+\item
+一言で言えば、「AとB2つの戦略を取る確率の対数の差」が「利得の差」に比例するような混合戦略をとります。
+\item
+式を整理することで、一意的に各戦略がとられる確率を導出できます。
+\item
+つまり、（見た目は複雑でも）構造自体は複雑ではありません。
+\item
+元論文のPDFを見てみましょう
+\end{itemize}
+\end{frame}
+
+\section{補足：ネットワークはどうした？}
+\begin{frame}
+\frametitle{ネットワークの方の進捗}
+\begin{itemize}\setlength{\parskip}{0.5em}
+\item
+どうも基礎知識が足りない感じがしたので、合宿の後くらいからおべんきょうを開始
+\item とりあえずやってみたこと
+　　\begin{itemize}
+    \item
+    coursera（無料のオンライン大学）で、M. Jacksonの「Social and Economic Networks」を受講（きのう単位取得）
+    \item
+    グラフ理論をかじる（どうも本の選定を間違えたようで、やる気を削がれ頓挫中…）
+    \item
+    ネットワークが絡む経済学の論文をいくつか読んだ（MorrisのContagionは現在進行形）
+    \end{itemize}
+\item
+読んだ論文の中で面白かったのは、"Rumors and Social Networks" (2014)\footnote{Francis Bloch, Gabrielle Demange, Rachel Kranton. "Rumors and Social Networks." PSE Working Papers n2014-15 2014} というワーキングペーパー。
+
+\end{itemize}
+\end{frame}
+
+\section{これからやること}
+\begin{frame}
+\frametitle{これからやること}
+\begin{itemize}\setlength{\parskip}{0.5em}
+\item
+"Monotone Potential Maximizer"のところに乗ってた論文から利得表をとってきて、今までの４つのモデル（KMR, Ellison, Stochastic Fictitious Play, Log-Linear）に入れて比較する
+\item
+実践の中で、比較しやすいよう各プログラムを改善していく
+\item
+ネットワークの方も継続（卒論にできるといいなあ、と思い始めているところ）
+\item
+ネットワーク班で、もしやることがあれば手伝います
+\end{itemize}
+\end{frame}
+
+
+
+
+\end{document}
