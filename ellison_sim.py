@@ -15,6 +15,7 @@ from __future__ import division
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import networkx as nx
 
 
 class Player:
@@ -27,24 +28,28 @@ class Player:
         self.action = random.choice(possible_actions)
     # the initial action is randomly chosen.
 
-
-class ellison():
+    
+class ellison:
     # This class "inherits" the class "Player" defined above
-    def __init__(self, N=10, n=1,
+    def __init__(self,network, n=1,
                  payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]]):
         """
         the default payoffs are those of "3*3 coordination games"
 
-        N = 10  The number of players
-        n = 1  The number of neighbors on one side.it is 2 in total when n = 1
+        n = 1  How far players you play a game with
         payoffs = The payoff matrix of the game 
+        network = The network you want to analyze.Use NetworkX graph
+        example: nx.cycle_graph(N)
         """
-        self.players = [Player(len(payoffs)) for i in range(N)]
+        self.players = \
+        [Player(len(payoffs)) for i in range(nx.number_of_nodes(network))]
         # "players" is a list consisting of "player"
         self.payoffs = payoffs
         self.num_actions = len(payoffs) # the number of actions
-        self.N = N
+        self.N = nx.number_of_nodes(network)
         self.n = n
+        self.network = network
+        self.adj_matrix = nx.adjacency_matrix(network)
         # actions players can take
         self.actions = range(len(payoffs))
 
@@ -61,22 +66,20 @@ class ellison():
     def update_rational(self):  # function used when a player is "rational"
         # pick a player which can change the action
         d = random.choice(range(self.N))
-        nei_numbers = []  # contains the number assigned to each neighbor
-        nei_numbers_with_large_small = [i for i in range(d-self.n, d+self.n+1)]
-        # contains the chosen player,may contain inappropriate numbers
-        del nei_numbers_with_large_small[self.n]  # delete the chosen player
-
-        for i in nei_numbers_with_large_small:
-            if i < 0:
-                i = i + self.N
-
-            if i >= self.N:
-                i = i - self.N
-
-            nei_numbers.append(i)
-
-        nei_actions = [self.players[i].action for i in nei_numbers]
+        # computing the shotest_path_length of every pair of players
+        s_path = nx.shortest_path_length(self.network)
+        s_path_from_d = s_path[d]
+        
+        # you cannot play a game with players further by more than n
+        for i in s_path_from_d.keys():
+            if s_path_from_d[i] > self.n:
+                del(s_path_from_d[i])
+        
+        del(s_path_from_d[d]) # can't play a game with yourself
+        
+        neighbors = s_path_from_d.keys() # whom you play a game with
         # neighbors' action profile
+        nei_actions = [self.players[i].action for i in neighbors]
 
         # computing the ratio of players taking a certain action in the nei
         proportions = np.empty(self.num_actions)
