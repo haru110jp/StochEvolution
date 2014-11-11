@@ -15,6 +15,7 @@ from __future__ import division
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 import networkx as nx
 
 
@@ -32,7 +33,7 @@ class Player:
 class ellison:
     # This class "inherits" the class "Player" defined above
     def __init__(self,network=nx.cycle_graph(10), n=1,
-                 payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]]):
+                 payoffs=[[4, 0], [3, 2]]):
         """
         the default payoffs are those of "3*3 coordination games"
 
@@ -123,6 +124,10 @@ class ellison:
         plt.show()
 
     def draw_histogram(self, x=1000, y=100, epsilon=0):
+        """
+        x: How many times you repeat the "set" of games
+        y: How many games constitute one set of games
+        """
         result_box = []
         for i in range(x):
 
@@ -145,5 +150,30 @@ class ellison:
 
         fig, ax = plt.subplots()
         ax.hist(result_box)
+        plt.show()
+
+    def draw_scatter(self,x=1000, epsilon=0.3): # only for 2*2 games
+        fig, ax = plt.subplots()
+        ax.set_xlim([0.0, 1.1])
+        ax.set_ylim([0.0, 1.1])
+
+        action_profile = [self.players[i].action for i in range(self.N)]
+        # the proportion of action1
+        profile = []
+        initial_state = action_profile.count(0) / float(self.N)
+        initial_dot = plt.scatter(initial_state, 1 - initial_state, c="red")
+        profile.append([initial_dot])
+        
+        for i in range(x):
+            if random.uniform(0, 1) > epsilon:
+                self.update_rational()
+            else:
+                self.update_irrational()
+            current_profile = [self.players[s].action for s in range(self.N)]
+            state = current_profile.count(0) / float(self.N)
+            dot = plt.scatter(state, 1- state, c="red")
+            profile.append([dot])
+        
+        ani = animation.ArtistAnimation(fig, profile, interval=1, repeat_delay=1000)
         plt.show()
 

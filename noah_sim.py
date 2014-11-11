@@ -16,7 +16,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.tri as tri
 import matplotlib.animation as animation
-from scipy.interpolate import interp1d
 
 class Player_Noah():
     """
@@ -150,67 +149,3 @@ ani2 = animation.ArtistAnimation(fig, ims2, interval=1, repeat_delay=1000)
 
 plt.show()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
-player0 = Player_Noah()
-player1 = Player_Noah()
-
-action_0 = []
-action_1 = []
-
-for i in range(100000):
-    a = player0.update_action()
-    action_0.append(a)
-    b = player1.update_action()
-    action_1.append(b)
-
-    player0.update_belief(b)
-    player1.update_belief(a)
-
-n_00 = 0
-n_01 = 0
-n_10 = 0
-n_11 = 0
-for i in range(100000):
-    b = (action_0[i], action_1[i])
-    if b == (0, 0):
-        n_00 = n_00 + 1
-    if b == (0, 1):
-        n_01 = n_01 + 1
-    if b == (1, 0):
-        n_10 = n_10 + 1
-    if b == (1, 1):
-        n_11 = n_11 + 1
-
-print(n_00, n_01, n_10, n_11)
-"""
