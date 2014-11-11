@@ -4,7 +4,6 @@
 ''License'': MIT license
 
 I thank Daisuke Oyama for his guidance and helpful advice.
-I am also grateful to Sarina Ogawa for her cooperation.
 
 This program can simulate the stochastic evolution model raised
 by G, Ellison(1993). The class of games this can handle
@@ -13,11 +12,24 @@ is a symmetric game with n strategies.
 """
 from __future__ import division
 import random
+from math import sqrt
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.tri as tri
 import matplotlib.animation as animation
 import networkx as nx
 
+"""
+"project_3d_to_simplex" is taken from plot_simplex.py by "oyamad"
+https://gist.github.com/oyamad/7a11edb8f8e8e24bcf0c
+"""
+# Returns the position of dots on the simplex
+def project_3d_to_simplex(points_ndarray):
+    x = np.empty((2, len(points_ndarray)))
+    x[:] = \
+        (points_ndarray[:, 0] + 2*points_ndarray[:, 2])*sqrt(3)/3, \
+        points_ndarray[:, 0]
+    return x
 
 class Player:
     def __init__(self, how_many_actions):
@@ -33,7 +45,7 @@ class Player:
 class ellison:
     # This class "inherits" the class "Player" defined above
     def __init__(self,network=nx.cycle_graph(10), n=1,
-                 payoffs=[[4, 0], [3, 2]]):
+                 payoffs=[[6, 0, 0], [5, 7, 5], [0, 6, 8]]):
         """
         the default payoffs are those of "3*3 coordination games"
 
@@ -152,10 +164,12 @@ class ellison:
         ax.hist(result_box)
         plt.show()
 
-    def draw_scatter(self,x=1000, epsilon=0.3): # only for 2*2 games
+    def draw_scatter2(self,x=1000, epsilon=0.1): # only for 2*2 games
         fig, ax = plt.subplots()
         ax.set_xlim([0.0, 1.1])
         ax.set_ylim([0.0, 1.1])
+        plt.xlabel("0")
+        plt.ylabel("1")
 
         action_profile = [self.players[i].action for i in range(self.N)]
         # the proportion of action1
@@ -177,3 +191,45 @@ class ellison:
         ani = animation.ArtistAnimation(fig, profile, interval=1, repeat_delay=1000)
         plt.show()
 
+    def draw_scatter3(self, x=1000, epsilon=0.1):
+        # Drawing the triangle (= simplex)
+        vertices= np.array([[sqrt(3)/3, 1], [0, 0], [2*sqrt(3)/3, 0]])
+        triangle = tri.Triangulation(vertices[:, 0], vertices[:, 1])
+
+        fig,ax  = plt.subplots()
+
+        # ax.set_xlim(0, 2*sqrt(3)/3)
+        # ax.set_ylim(0, 1)
+        ax.triplot(triangle)
+        ax.set_axis_off()
+        # ax.set_xlim(0, 2*sqrt(3)/3)
+        # ax.set_ylim(0, 1)
+        ax.text(0, 0, '1')
+        ax.text(sqrt(3)/3, 1, '0')
+        ax.text(2*sqrt(3)/3, 0, '2')
+        
+        action_profile = [self.players[i].action for i in range(self.N)]
+        state_lists = np.empty((x, self.num_actions))
+
+        for m in range(x):
+            for i in range(self.num_actions): # computing the state
+                current_profile = [self.players[s].action for s in range(self.N)]
+                proportion_of_i = current_profile.count(i) / float(self.N)
+                state_lists[m][i] = proportion_of_i
+            # proceed the game
+            if random.uniform(0, 1) > epsilon:
+                self.update_rational()
+            else:
+                self.update_irrational()
+                
+        states_on_simplex = project_3d_to_simplex(state_lists)
+
+        # Plot the scatter. 
+        ims = []
+        # Converting s.t. we can use Artist animation
+        for i in range(x):
+            im = plt.scatter(states_on_simplex[0][i], states_on_simplex[1][i], c="blue")
+            ims.append([im])
+        ani = animation.ArtistAnimation(fig, ims, interval=1, repeat_delay=1000)
+
+        plt.show()
