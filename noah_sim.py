@@ -149,3 +149,20 @@ ani2 = animation.ArtistAnimation(fig, ims2, interval=1, repeat_delay=1000)
 
 plt.show()
 
+
+# Drawing a histogram
+result_box = []
+
+for i in range(T):
+    a = player0.update_action()
+    b = player1.update_action()
+    
+    result_box.append(a)
+    result_box.append(b)
+
+    player0.update_belief(b)
+    player1.update_belief(a)
+
+fig, ax = plt.subplots()
+ax.hist(result_box)
+plt.show()

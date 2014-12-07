@@ -19,7 +19,7 @@ class Player_loglin():
     def __init__(self, beta=1, payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]]):
         # The payoff shocks are assumed to be normally distributed
         self.num_actions = len(payoffs)
-        self.action = 0 # The initial action doesn't matter.
+        self.action = random.choice(range(len(payoffs)))
         self.beta = beta
         self.payoffs = np.array(payoffs)
 
@@ -28,7 +28,7 @@ class Player_loglin():
         # First compute the probability with which an action is taken.
         # Computing (2.3) in the original thesis by Okada and Oliver.
         prob_distribution = np.zeros(self.num_actions)
-        
+
         for i in range(self.num_actions):
             x = 0
             for n in range(self.num_actions):
@@ -38,9 +38,26 @@ class Player_loglin():
             
             prob_of_i = exp(y) / x
             prob_distribution[i] = prob_of_i
-            print prob_of_i
-        
+
         # Let's decide which action is taken.
         p = prob_distribution.cumsum()
-        print p
         return p.searchsorted(random.uniform(0, 1))
+
+# draw the histogram about the outcome
+
+T = 10000
+result_box = []
+
+player0 = Player_loglin(payoffs=[[13, 3, 0], [5, 0, 13], [0, 2, 16]])
+player1 = Player_loglin(payoffs=[[13, 3, 0], [5, 0, 13], [0, 2, 16]])
+
+for i in range(T):
+    a = player0.update_action(player1.action)
+    b = player1.update_action(player0.action)
+    
+    result_box.append(a)
+    result_box.append(b)
+
+fig, ax = plt.subplots()
+ax.hist(result_box)
+plt.show()
