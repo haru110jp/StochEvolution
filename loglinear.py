@@ -16,7 +16,8 @@ class Player_loglin():
     beta: The indicator of rationality. Completely random if 0.
     payoffs: payoff matrix.Only symmetric games are allowed.
     """
-    def __init__(self, beta=1, payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]]):
+    def __init__(self, beta=1, rev_chance=0.5, \
+            payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]]):
         # The payoff shocks are assumed to be normally distributed
         self.num_actions = len(payoffs)
         self.action = random.choice(range(len(payoffs)))
@@ -43,6 +44,36 @@ class Player_loglin():
         p = prob_distribution.cumsum()
         return p.searchsorted(random.uniform(0, 1))
 
+    def compute_stationary(self, p=0.5):
+        # p: the probability player a is given the opportunity to act.
+        num_states = self.num_actions**2
+        tran = np.zeros([num_states, num_states])
+        prob_distribution = np.zeros(self.num_actions)
+        
+        for a in range(num_states):
+            action_a = a // self.num_actions
+            action_b = a % self.num_actions
+            x = 0
+            for b in range(self.num_actions):
+                x = x + exp(self.payoffs[action_a][b] * self.beta)
+
+            for c in range(self.num_actions):
+                y = (self.payoffs[action_a][c]) * self.beta
+                prob_of_c = p * (exp(y) / x)
+                prob_distribution[c] = prob_of_c
+            
+            for i in range(self.num_actions):
+                tran[action_a + self.num_actions*i][a] = prob_distribution[i]
+                if action_b==0:
+                    tran[action_b + i][a] += prob_distribution[i]
+                elif action_b==1:
+                    tran[action_b - 1 + i][a] += prob_distribution[i]
+                elif action_b==2:
+                    tran[action_b - 2 + i][a] += prob_distribution[i]
+                    
+        return tran
+
+
 # draw the histogram about the outcome
 
 T = 10000
@@ -52,8 +83,10 @@ player0 = Player_loglin(payoffs=[[13, 3, 0], [5, 0, 13], [0, 2, 16]])
 player1 = Player_loglin(payoffs=[[13, 3, 0], [5, 0, 13], [0, 2, 16]])
 
 for i in range(T):
-    a = player0.update_action(player1.action)
-    b = player1.update_action(player0.action)
+    if np.random.random() > 0.5:
+        a = player0.update_action(player1.action)
+    else:
+        b = player1.update_action(player0.action)
     
     result_box.append(a)
     result_box.append(b)
