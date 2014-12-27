@@ -16,8 +16,7 @@ class Player_loglin():
     beta: The indicator of rationality. Completely random if 0.
     payoffs: payoff matrix.Only symmetric games are allowed.
     """
-    def __init__(self, beta=1, rev_chance=0.5, \
-            payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]]):
+    def __init__(self, beta=1, payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]]):
         # The payoff shocks are assumed to be normally distributed
         self.num_actions = len(payoffs)
         self.action = random.choice(range(len(payoffs)))
