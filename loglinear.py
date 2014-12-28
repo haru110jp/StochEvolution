@@ -5,6 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.tri as tri
 from scipy.interpolate import interp1d
+import gth_solve as gth
+
 
 class Player_loglin():
     """
@@ -62,19 +64,27 @@ class Player_loglin():
                 prob_distribution[c] = prob_of_c
             
             for i in range(self.num_actions):
-                tran[action_a + self.num_actions*i][a] = prob_distribution[i]
+                tran[a][action_a + self.num_actions*i] = prob_distribution[i]
+            
+            for d in range(self.num_actions):
+                y = (self.payoffs[action_a][d]) * self.beta
+                prob_of_d = (1 - p) * (exp(y) / x)
+                prob_distribution[d] = prob_of_d
+            
+            for i in range(self.num_actions):
                 if action_b==0:
-                    tran[action_b + i][a] += prob_distribution[i]
+                    tran[a][action_b + i] += prob_distribution[i]
                 elif action_b==1:
-                    tran[action_b - 1 + i][a] += prob_distribution[i]
+                    tran[a][action_b - 1 + i] += prob_distribution[i]
                 elif action_b==2:
-                    tran[action_b - 2 + i][a] += prob_distribution[i]
+                    tran[a][action_b - 2 + i] += prob_distribution[i]
                     
-        return tran
+        u = gth.gth_solve(tran)
+        return u
 
 
 # draw the histogram about the outcome
-
+"""
 T = 10000
 result_box = []
 
@@ -84,12 +94,13 @@ player1 = Player_loglin(payoffs=[[13, 3, 0], [5, 0, 13], [0, 2, 16]])
 for i in range(T):
     if np.random.random() > 0.5:
         a = player0.update_action(player1.action)
+        result_box.append(a)
+
     else:
         b = player1.update_action(player0.action)
-    
-    result_box.append(a)
-    result_box.append(b)
+        result_box.append(b)
 
 fig, ax = plt.subplots()
 ax.hist(result_box)
 plt.show()
+"""
