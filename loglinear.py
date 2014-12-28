@@ -34,9 +34,9 @@ class Player_loglin():
         for i in range(self.num_actions):
             x = 0
             for n in range(self.num_actions):
-                x = x + exp(self.payoffs[opponent_action][n] * self.beta)
+                x = x + exp(self.payoffs[n][opponent_action] * self.beta)
             
-            y = (self.payoffs[opponent_action][i]) * self.beta
+            y = (self.payoffs[i][opponent_action]) * self.beta
             
             prob_of_i = exp(y) / x
             prob_distribution[i] = prob_of_i
@@ -49,35 +49,40 @@ class Player_loglin():
         # p: the probability player a is given the opportunity to act.
         num_states = self.num_actions**2
         tran = np.zeros([num_states, num_states])
-        prob_distribution = np.zeros(self.num_actions)
         
         for a in range(num_states):
             action_a = a // self.num_actions
             action_b = a % self.num_actions
             x = 0
+            s = 0
+            prob_distribution = np.zeros(self.num_actions)
+
             for b in range(self.num_actions):
-                x = x + exp(self.payoffs[action_a][b] * self.beta)
+                x = x + exp(self.payoffs[b][action_b] * self.beta)
 
             for c in range(self.num_actions):
-                y = (self.payoffs[action_a][c]) * self.beta
+                y = (self.payoffs[c][action_b]) * self.beta
                 prob_of_c = p * (exp(y) / x)
                 prob_distribution[c] = prob_of_c
             
             for i in range(self.num_actions):
-                tran[a][action_a + self.num_actions*i] = prob_distribution[i]
-            
+                tran[a][action_b + self.num_actions*i] = prob_distribution[i]
+
             for d in range(self.num_actions):
-                y = (self.payoffs[action_a][d]) * self.beta
-                prob_of_d = (1 - p) * (exp(y) / x)
-                prob_distribution[d] = prob_of_d
+                s = s + exp(self.payoffs[d][action_a] * self.beta)
+            
+            for e in range(self.num_actions):
+                t = (self.payoffs[e][action_a]) * self.beta
+                prob_of_e = (1 - p) * (exp(t) / s)
+                prob_distribution[e] = prob_of_e
             
             for i in range(self.num_actions):
-                if action_b==0:
-                    tran[a][action_b + i] += prob_distribution[i]
-                elif action_b==1:
-                    tran[a][action_b - 1 + i] += prob_distribution[i]
-                elif action_b==2:
-                    tran[a][action_b - 2 + i] += prob_distribution[i]
+                if action_a==0:
+                    tran[a][self.num_actions*action_a + i] += prob_distribution[i]
+                elif action_a==1:
+                    tran[a][self.num_actions*action_a + i] += prob_distribution[i]
+                elif action_a==2:
+                    tran[a][self.num_actions*action_a + i] += prob_distribution[i]
                     
         u = gth.gth_solve(tran)
         return u
