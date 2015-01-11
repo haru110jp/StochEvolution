@@ -2,6 +2,7 @@ from __future__ import division
 import random
 from math import factorial
 import numpy as np
+from gth_solve import gth_solve
 
 def cool_lex(s, t):
     """
@@ -63,3 +64,46 @@ def cool_lex(s, t):
             states.append(current_state)
             
     return states
+
+def kmr_compute_stationary(n, epsilon=0.01, payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]]):
+    """
+    This function calculates the stationary state of KMR in genetal cases.
+    n : int 
+        The number of Players
+    epsilon : float
+        The probability of mutation
+    Payoffs : list
+        The payoff matrix(symmetric)
+    """
+    num_action = len(payoffs)
+    states_cool_lex = cool_lex(n, num_action-1)
+    states = []
+    num_zeros = n
+    num_ones = num_action -1
+    num_states = int(factorial(num_zeros + num_ones) / (factorial(num_zeros)*factorial(num_ones)))
+    tran_matrix = np.zeros([num_states, num_states])
+    print states_cool_lex
+    for i in states_cool_lex:
+        profile = []
+        for m, n in enumerate(i.split("1")):
+            profile.append(len(n))
+        states.append(profile) # ex. [nparray([0,2,0,1,0]), ...]
+
+    for s, i in enumerate(states):
+        current_profile = np.array(i) / sum(i)
+        expected_payoff = np.dot(payoffs, current_profile)
+        best_reply = expected_payoff.argmax()
+        state_no_before = s
+        for m, n in enumerate(i):
+            if n != 0: # The player may be chosen
+                for k in range(num_action):
+                    adjacent_state = list(i)
+                    adjacent_state[m] = adjacent_state[m] - 1
+                    adjacent_state[k] = adjacent_state[k] + 1
+                    state_no_after = states.index(adjacent_state)
+                    if k == best_reply:
+                        tran_matrix[state_no_before][state_no_after] = 1 - epsilon*(1 - 1/float(num_action))
+                    else:
+                        tran_matrix[state_no_before][state_no_after] = epsilon * (1/float(num_action))
+    print tran_matrix
+    return gth_solve(tran_matrix)

@@ -45,7 +45,7 @@ class Player:
 class ellison:
     # This class "inherits" the class "Player" defined above
     def __init__(self,network=nx.cycle_graph(10), n=1,
-                 payoffs=[[6, 0, 0], [5, 7, 5], [0, 6, 8]]):
+                 payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]]):
         """
         the default payoffs are those of "3*3 coordination games"
 
