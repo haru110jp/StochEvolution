@@ -49,7 +49,9 @@ class Player_loglin():
         # p: the probability player a is given the opportunity to act.
         num_states = self.num_actions**2
         tran = np.zeros([num_states, num_states])
-        
+        """
+        state:(0,0)(0,1)(0,2)(1,0)(1,1)....
+        """
         for a in range(num_states):
             action_a = a // self.num_actions
             action_b = a % self.num_actions
