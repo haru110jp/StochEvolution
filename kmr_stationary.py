@@ -87,23 +87,23 @@ def kmr_compute_stationary(n, epsilon=0.01, payoffs=[[6, 0, 0], [5, 7, 5], [0, 5
         profile = []
         for m, n in enumerate(i.split("1")):
             profile.append(len(n))
-        states.append(profile) # ex. [nparray([0,2,0,1,0]), ...]
+        states.append(profile) # ex. [[0,2,0,1,0], ...]
 
     for s, i in enumerate(states):
         current_profile = np.array(i) / sum(i)
         expected_payoff = np.dot(payoffs, current_profile)
         best_reply = expected_payoff.argmax()
         state_no_before = s
-        for m, n in enumerate(i):
-            if n != 0: # The player may be chosen
+        for x, y in enumerate(i):
+            if y != 0: # The player may be chosen
                 for k in range(num_action):
                     adjacent_state = list(i)
-                    adjacent_state[m] = adjacent_state[m] - 1
+                    adjacent_state[x] = adjacent_state[x] - 1
                     adjacent_state[k] = adjacent_state[k] + 1
                     state_no_after = states.index(adjacent_state)
                     if k == best_reply:
-                        tran_matrix[state_no_before][state_no_after] = 1 - epsilon*(1 - 1/float(num_action))
+                        tran_matrix[state_no_before][state_no_after] = tran_matrix[state_no_before][state_no_after] + (y / num_zeros) * (1 - epsilon * (1 - 1/float(num_action)))
                     else:
-                        tran_matrix[state_no_before][state_no_after] = epsilon * (1/float(num_action))
+                        tran_matrix[state_no_before][state_no_after] = tran_matrix[state_no_before][state_no_after] + (y / num_zeros) * epsilon * (1/float(num_action))
     print tran_matrix
     return gth_solve(tran_matrix)
