@@ -32,30 +32,34 @@ def project_3d_to_simplex(points_ndarray):
     return x
 
 class Player:
-    def __init__(self, how_many_actions):
+    def __init__(self, how_many_actions, init):
         self.num_of_actions = how_many_actions
-        self.init_action()
-        
-    def init_action(self):
-        possible_actions = range(self.num_of_actions)
-        self.action = random.choice(possible_actions)
-    # the initial action is randomly chosen.
+        self.init_action(random)
 
-    
+    def init_action(self, random):
+        if init != None:
+            # random takes int
+            self.action = random
+        else:
+            possible_actions = range(self.num_of_actions)
+            self.action = random.choice(possible_actions)
+            # the initial action is randomly chosen.
+
+
 class ellison:
     # This class "inherits" the class "Player" defined above
     def __init__(self,network=nx.cycle_graph(10), n=1,
-                 payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]]):
+                 payoffs=[[6, 0, 0], [5, 7, 5], [0, 5, 8]], init=None):
         """
         the default payoffs are those of "3*3 coordination games"
 
         n = 1  How far players you play a game with
-        payoffs = The payoff matrix of the game 
+        payoffs = The payoff matrix of the game
         network = The network you want to analyze.Use NetworkX graph
         example: nx.cycle_graph(6)
         """
         self.players = \
-        [Player(len(payoffs)) for i in range(nx.number_of_nodes(network))]
+        [Player(len(payoffs), init) for i in range(nx.number_of_nodes(network))]
         # "players" is a list consisting of "player"
         self.payoffs = payoffs
         self.num_actions = len(payoffs) # the number of actions
@@ -82,14 +86,14 @@ class ellison:
         # computing the shotest_path_length of every pair of players
         s_path = nx.shortest_path_length(self.network)
         s_path_from_d = s_path[d]
-        
+
         # you cannot play a game with players further by more than n
         for i in s_path_from_d.keys():
             if s_path_from_d[i] > self.n:
                 del(s_path_from_d[i])
-        
+
         del(s_path_from_d[d]) # can't play a game with yourself
-        
+
         neighbors = s_path_from_d.keys() # whom you play a game with
         # neighbors' action profile
         nei_actions = [self.players[i].action for i in neighbors]
@@ -154,7 +158,7 @@ class ellison:
             for i in range(self.num_actions):
                 proportion_of_i = action_profile.count(i) / float(self.N)
                 proportions[i] = proportion_of_i
-            
+
             # finding out the most popular strategy
             result_box.append(proportions.argmax())
             # Initializing the profile to go on to the next game
@@ -177,7 +181,7 @@ class ellison:
         initial_state = action_profile.count(0) / float(self.N)
         initial_dot = plt.scatter(initial_state, 1 - initial_state, c="red")
         profile.append([initial_dot])
-        
+
         for i in range(x):
             if random.uniform(0, 1) > epsilon:
                 self.update_rational()
@@ -187,7 +191,7 @@ class ellison:
             state = current_profile.count(0) / float(self.N)
             dot = plt.scatter(state, 1- state, c="red")
             profile.append([dot])
-        
+
         ani = animation.ArtistAnimation(fig, profile, interval=1, repeat_delay=1000)
         plt.show()
 
@@ -207,7 +211,7 @@ class ellison:
         ax.text(0, 0, '1')
         ax.text(sqrt(3)/3, 1, '0')
         ax.text(2*sqrt(3)/3, 0, '2')
-        
+
         action_profile = [self.players[i].action for i in range(self.N)]
         state_lists = np.empty((x, self.num_actions))
 
@@ -221,10 +225,10 @@ class ellison:
                 self.update_rational()
             else:
                 self.update_irrational()
-                
+
         states_on_simplex = project_3d_to_simplex(state_lists)
 
-        # Plot the scatter. 
+        # Plot the scatter.
         ims = []
         # Converting s.t. we can use Artist animation
         for i in range(x):
